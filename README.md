@@ -7,5 +7,5 @@ Directory `finetuning` contains code for finetuning an ImageNet pretrained model
 
 Run TF model server, run `wrapper.py` in Flask
 
-Test with `curl -d "urs=https://drive.etfbl.net/s/Wat52qcpm5P9YzC/preview,https://drive.etfbl.net/s/ZjpLszJDBopfCWk/preview" -X POST http://localhost:5000`.
+Test with `curl -d "urls=https://drive.etfbl.net/s/Wat52qcpm5P9YzC/preview,https://drive.etfbl.net/s/ZjpLszJDBopfCWk/preview" -X POST http://localhost:5000`.
 
