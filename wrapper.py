@@ -23,13 +23,17 @@ def index():
     req = {'signature_name': 'serving_default',
            'instances': []}
     for url in urls:
-        print(url)
         image_bytes = base64.b64encode(requests.get(url).content).decode('utf-8')
-#        image_bytes = requests.get(url).content
         req['instances'].append({'b64': image_bytes})
 
     json_response = requests.post('http://localhost:8501/v1/models/rssc/versions/1:predict', 
                                       headers=headers,
                                       data=json.dumps(req))
-    return '{}'.format(json.dumps(json_response.json(), indent=4))
+    return json_response.json()
 
+@app.route('/images', methods=['POST'])
+def classify_images():
+    json_response = requests.post('http://localhost:8501/v1/models/rssc/versions/1:predict',
+            headers=request.headers,
+            data=request.data)
+    return json_response.json()
