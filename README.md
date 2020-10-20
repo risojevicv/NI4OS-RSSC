@@ -5,3 +5,7 @@ Code for building a Tensorflow SavedModel for remote sensing scene classificatio
 
 Directory `finetuning` contains code for finetuning an ImageNet pretrained model on a dataset of remote sensing images.
 
+Run TF model server, run `wrapper.py` in Flask
+
+Test with `curl -d "urls=https://drive.etfbl.net/s/Wat52qcpm5P9YzC/preview,https://drive.etfbl.net/s/ZjpLszJDBopfCWk/preview" -X POST http://localhost:5000`.
+

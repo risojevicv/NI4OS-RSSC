@@ -15,27 +15,17 @@ import base64
 #import tensorflow as tf
 import time
 
-test_paths = ['/home/vlado/dl/data/NWPU-RESISC45/airplane/airplane_001.jpg',
-              '/home/vlado/dl/data/NWPU-RESISC45/airport/airport_001.jpg',
-              '/home/vlado/dl/data/NWPU-RESISC45/baseball_diamond/baseball_diamond_001.jpg']
+test_urls = [r'https://drive.etfbl.net/s/Wat52qcpm5P9YzC/preview',
+              r'https://drive.etfbl.net/s/ZjpLszJDBopfCWk/preview']
 
-headers = {'content-type': 'application/json'}
-req = {'signature_name': 'serving_default', 
-       'instances': []}
+headers = {'content-type': 'application/x-www-form-urlencoded'}
+data = 'urls=' + ','.join(test_urls)
 
-for image_path in test_paths:
-    with open(image_path, 'rb') as f:
-        image_bytes = base64.b64encode(f.read()).decode('utf-8')
-        req['instances'].append({'b64': image_bytes})
-
-data = json.dumps(req)
 for _ in range(10):
-
     t0 = time.time()
-    json_response = requests.post('http://localhost:5000/images',
+    json_response = requests.post('http://localhost:5000',
                                   headers=headers,
                                   data=data)
-
     print('Elapsed time: {:.2f}'.format(time.time() - t0))
 
 print(json.dumps(json_response.json(), indent=4))
