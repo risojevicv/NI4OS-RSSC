@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='custom.css') }}">
+
+    <title>NI4OS Remote Sensing Classifier</title>
+  </head>
+  <body>
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+      <a class="navbar-brand" href="{{ url_for('url') }}"><img src="{{ url_for('static', filename='images/NI4OS_logo.png') }}"></a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('url') }}">URL</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('upload') }}">Upload</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    {% endblock %}
+    <script src="{{ url_for('static', filename='jquery-3.5.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='custom.js') }}"></script>
+    <script src="{{ url_for('static', filename='bs-custom-file-input.js') }}"></script>
+    {% block content %}{% endblock %}
+  </body>
+</html>
