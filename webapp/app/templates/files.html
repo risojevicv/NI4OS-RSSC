@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 style="font-family: roboto;">Upload images</h1>
+    <form action="" method="POST" novalidate enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="form-group custom-file" style="margin-bottom: 1rem;">
+            {{ form.files(class_="custom-file-input") }}
+            <label style="font-family: roboto;" class="custom-file-label" for="files">Choose images</label>
+        </div>
+        <p style="text-align: right;">{{ form.submit(class_="btn btn-primary") }}</p>
+    </form>
+</div>
+{% endblock %}

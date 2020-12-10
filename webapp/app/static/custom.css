@@ -1,0 +1,34 @@
+@font-face {
+    font-family: roboto;
+    src: url(fonts/Roboto-Regular.ttf);
+}
+
+@font-face {
+    font-family: roboto;
+    src: url(fonts/Roboto-Bold.ttf);
+    font-weight: bold;
+}
+
+.navbar{
+    margin-bottom: 1rem;
+}
+
+*{
+    font-family: roboto;
+}
+
+.progress {
+    position: relative;
+}
+  
+.progress-bar-title {
+    position: absolute;
+    text-align: center;
+    line-height: 28px; /* line-height should be equal to bar height */
+    font-size: 16px;
+    overflow: hidden;
+    color: black;
+    right: 0;
+    left: 0;
+    top: 0;
+}
