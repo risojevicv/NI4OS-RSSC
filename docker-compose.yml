@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  flask:
+    container_name: ni4os-webapp
+    restart: always
+    build:
+        context: ./webapp
+        dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+  tf_serving:
+    container_name: rssc
+    restart: always
+    build:
+        context: ./service
+        dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
