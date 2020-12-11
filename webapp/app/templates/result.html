@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container">
+        <h1 style="font-family: roboto;">Classification results</h1>
+
+        {% for item in res %}
+        <div class="row border bg-light">
+            <div class="col-md-4 justify-content-center">
+                {% if item.mimetype %}
+                    <img src="data:{{ item.mimetype }};base64, {{ item.image }}" class="py-md-1 mx-auto d-block" style="max-height: 200px; max-width: 350px;">
+                {% else %}
+                    <img src="{{ item.image }}" class="py-md-1 mx-auto d-block" style="max-height: 200px; max-width: 350px;">
+                {% endif %}
+            </div>
+            <div class="col-md-8 justify-content-center">
+                {% for class, value in item.results.items() %}
+                        <div class="row py-md-1">
+                            <div class="col-md-4 text-right">
+                                <label style="font-family: roboto; font-weight: bold;">{{ class }}</label>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="progress position-relative" style="height: 28px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <small class="justify-content-center d-flex position-absolute w-100" style="line-height: 28px; font-size: 16px;">{{ value }}%</small>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+{% endblock %}
