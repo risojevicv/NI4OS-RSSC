@@ -5,7 +5,7 @@ NI4OS Remote Sensing Scene Classification
 
 Directory `service` contains code for tensorflow serving model. Directory `webapp` contains code for frontend app that can be used for service demonstration. Webapp also contains code for wrapping tf serving calls.
 
-RUn with `docker-compuse up`
+Run with `docker-compuse up`
 
 # Old
 
