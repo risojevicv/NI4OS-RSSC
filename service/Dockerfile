@@ -1,6 +1,6 @@
 FROM tensorflow/serving
 WORKDIR /
-COPY models /models/rssc
+COPY models /models
+COPY models.config /models/models.config
 EXPOSE 8501
-ENV MODEL_NAME rssc
-ENV MODEL_BASE_PATH /models
+CMD ["--model_config_file=/models/models.config"]
