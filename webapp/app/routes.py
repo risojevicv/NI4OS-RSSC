@@ -22,6 +22,20 @@ def url_api():
                                       data=json.dumps(req))
     return json_response.json()
 
+@app.route('/multilabel-url-api', methods=['POST'])
+def multilabel_url_api():
+    urls = request.form['urls'].split(',')
+    headers = {'content-type': 'application/json'}
+    req = {'signature_name': 'serving_default',
+           'instances': []}
+    for url in urls:
+        image_bytes = base64.b64encode(requests.get(url).content).decode('utf-8')
+        req['instances'].append({'b64': image_bytes})
+
+    json_response = requests.post('http://rssc:8501/v1/models/multilabel-rssc/versions/1:predict', 
+                                      headers=headers,
+                                      data=json.dumps(req))
+    return json_response.json()
 
 @app.route('/upload-api', methods=['POST'])
 def classify_images():
@@ -30,6 +44,12 @@ def classify_images():
             data=request.data)
     return json_response.json()
 
+@app.route('/multilabel-upload-api', methods=['POST'])
+def classify_images_multilabel():
+    json_response = requests.post('http://rssc:8501/v1/models/multilabel-rssc/versions/1:predict',
+            headers=request.headers,
+            data=request.data)
+    return json_response.json()
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -42,9 +62,9 @@ def url():
     form = URLForm()
 
     if form.validate_on_submit():
-        result = perform_url_request(form.url.data)
+        result = perform_url_request(form.url.data, form.task.data)
 
-        return render_template('result.html', title='Results', res=result)
+        return render_template('result.html', title='Results', res=result, task=form.task.data.lower())
 
     return render_template('url.html', title='URL', form=form)
 
@@ -54,12 +74,12 @@ def upload():
     form = FilesForm()
 
     if form.validate_on_submit():
-        result = perform_upload_request(form.files.data)
+        result = perform_upload_request(form.files.data, form.task.data)
 
         #print(form.files.data.mimetype)
 
         return render_template('result.html', title='Results',
-                               res=result)
+                               res=result, task=form.task.data.lower())
         #print(form.files.data.read())
 
     return render_template('files.html', title='Upload', form=form)
