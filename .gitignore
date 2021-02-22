@@ -1,5 +1,4 @@
 service/finetune/__pycache__/*
-service/models/*
 webapp/app/__pycache__/*
 .vscode/*
 .vscode
