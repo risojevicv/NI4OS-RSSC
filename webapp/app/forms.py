@@ -1,13 +1,15 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, MultipleFileField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, MultipleFileField, SelectField
+from wtforms.validators import DataRequired, Required
 
 
 class URLForm(FlaskForm):
     url = StringField('Image URL', validators=[DataRequired()])
-    submit = SubmitField('Classify')
+    task = SelectField('Task', choices=['Classification', 'Tagging'], validators=[Required()])
+    submit = SubmitField('Submit')
 
 
 class FilesForm(FlaskForm):
     files = MultipleFileField('Upload images', validators=[DataRequired()])
-    submit = SubmitField('Classify')
+    task = SelectField('Task', choices=['Classification', 'Tagging'], validators=[Required()])
+    submit = SubmitField('Submit')
