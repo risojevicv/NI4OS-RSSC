@@ -1,5 +1,5 @@
 # NI4OS-RSSC
-NI4OS Remote Sensing Scene Classification
+## NI4OS Remote Sensing Scene Classification
 
 
 Directory `service` contains code for TensorFlow Serving model. The trained models can be downloaded  [here](https://drive.google.com/drive/folders/1Yp_B--dWDimvJFLA3cssxTrHTcZkV8Hu?usp=sharing) and should be put to `service/models` directory. Directory `webapp` contains code for frontend app that can be used for service demonstration. Webapp also contains code for wrapping TensorFlow Serving calls.
