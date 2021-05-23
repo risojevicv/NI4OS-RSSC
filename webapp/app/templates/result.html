@@ -3,9 +3,9 @@
 {% block content %}
     <div class="container">
         {% if task == "classification" %}
-            <h1 style="font-family: roboto;">Classification results</h1>
+            <h2 style="font-family: roboto;">Classification results</h2>
         {% else %}
-            <h1 style="font-family: roboto;">Tagging results</h1>
+            <h2 style="font-family: roboto;">Tagging results</h2>
         {% endif %}
 
         {% for item in res %}
@@ -35,5 +35,6 @@
         </div>
         <br>
         {% endfor %}
+	<a href="http://localhost:8080">New image</a>
     </div>
 {% endblock %}
