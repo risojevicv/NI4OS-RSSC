@@ -2,3 +2,4 @@ service/finetune/__pycache__/*
 webapp/app/__pycache__/*
 .vscode/*
 .vscode
+*.swp
