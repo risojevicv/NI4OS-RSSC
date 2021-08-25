@@ -1,67 +1,58 @@
 {% extends "base.html" %}
 
 {% block navbar %}
-    <nav class="navbar navbar-expand navbar-light container">
-<!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand navbar-light container">
+  <!--      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
 </button> -->
-    
-<!--      <div class="collapse navbar-collapse" id="navbarSupportedContent"> -->
-        <ul class="navbar-nav nav-tabs col">
-          <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('upload') }}">Upload images</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('url') }}">Enter image URL</a>
-          </li>
-        </ul>
-	<!--            </div> -->
-	</nav>
+
+  <!--      <div class="collapse navbar-collapse" id="navbarSupportedContent"> -->
+  <ul class="navbar-nav nav-tabs col">
+    <li class="nav-item">
+      <a class="nav-link active" href="{{ url_for('upload') }}">Upload images</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('url') }}">Enter image URL</a>
+    </li>
+  </ul>
+  <!--            </div> -->
+</nav>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-	<!--    <h2 style="font-family: roboto;">Upload images</h2> -->
-	<form action="{{ url_for('upload') }}" method="POST" novalidate enctype="multipart/form-data">
-        {{ form_upload.hidden_tag() }}
-        <div class="form-group custom-file" style="margin-bottom: 1rem;">
-            {{ form_upload.files(class_="custom-file-input") }}
-            <label style="font-family: roboto;" class="custom-file-label" for="files">Choose images</label>
-        </div>
-        <div class="form-group">
-	    <p>{{ form_upload.task.label }}<br>
-            {{ form_upload.task(class_="form-control") }}</p>
-        </div>
-        <p style="text-align: right;">{{ form_upload.submit(class_="btn btn-primary") }}</p>
-    </form>
+  <!--    <h2 style="font-family: roboto;">Upload images</h2> -->
+  <form action="{{ url_for('upload') }}" method="POST" novalidate enctype="multipart/form-data">
+    {{ form_upload.hidden_tag() }}
+    <div class="form-group custom-file" style="margin-bottom: 1rem;">
+      {{ form_upload.files(class_="custom-file-input") }}
+      <label style="font-family: roboto;" class="custom-file-label" for="files">Choose images</label>
+    </div>
+    <div class="form-group">
+      <p>{{ form_upload.task.label }}<br>
+        {{ form_upload.task(class_="form-control") }}</p>
+    </div>
+    <p style="text-align: right;">{{ form_upload.submit(class_="btn btn-primary") }}</p>
+  </form>
 </div>
 <div class="container">
-    <div class="row">
-       <div class="col">
-	 Or try one of these:
-       </div>
+  <div class="row">
+    <div class="col">
+      Or try one of these:
     </div>
-    <div class="row p-auto">
-      <div class="col-3">
-	      <form action="{{ url_for('example') }}" method="POST" novalidate enctype="multipart/form-data">
-	          {{ form_example.hidden_tag() }}
-          <button type=submit class="btn btn-primary">
-            <img src="{{ url_for('static', filename='images/farmland_52.jpg') }}" class="float-left img-fluid" width="224" height="224">
-	  </button>
-	</form>
+  </div>
+  <form action="{{ url_for('example') }}" method="POST" novalidate enctype="multipart/form-data">
+    {{ form_example.hidden_tag() }}
+    <div class="btn-group-justified">
+    {% for ex in examples %}
+      <div class="btn-group">
+        <button type="submit" value="{{ ex }}" name="example" class="btn">
+          <img src="{{ url_for('static', filename='images/'+ex) }}" width="224" height="224">
+        </button>
       </div>
-
-      <div class="col-3">
-	<img src="{{ url_for('static', filename='images/mediumresidential_58.jpg') }}" class="float-left img-fluid" width="224" height="224">
-      </div>
-
-      <div class="col-3">
-	<img src="{{ url_for('static', filename='images/bridge_22.jpg') }}" class="float-left img-fluid" width="224" height="224">
-      </div>
-
-      <div class="col-3">
-	<img src="{{ url_for('static', filename='images/storagetanks_1.jpg') }}" class="float-left img-fluid" width="224" height="224">
-      </div>
-    </div> 
+    {% endfor %}
+    </div>
+  </form>
+</div>
 
 {% endblock %}
