@@ -74,6 +74,7 @@ def url():
 def upload():
     form_upload = FilesForm()
     form_example = ExampleForm()
+    examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_upload.validate_on_submit():
         result = perform_upload_request(form_upload.files.data, form_upload.task.data)
@@ -82,16 +83,17 @@ def upload():
                                res=result, task=form_upload.task.data.lower())
 
     return render_template('files.html', title='Upload', 
-            form_upload=form_upload, form_example=form_example)
+            form_upload=form_upload, form_example=form_example, examples=examples)
 
 
 @app.route('/example', methods=['POST'])
 def example():
     form_upload = FilesForm()
     form_example = ExampleForm()
+    examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_example.validate_on_submit():
-        image_path = os.path.join('static', form_example.url.data)
+        image_path = os.path.join('static/images', request.form.get('example'))
         with app.open_resource(image_path, 'rb') as f:
             f.mimetype = 'image/jpeg'
             result = perform_upload_request([f, ], 'classification')
@@ -101,7 +103,7 @@ def example():
                                res=result, task='classification')
 
     return render_template('files.html', title='Upload', 
-            form_upload=form_upload, form_example=form_example)
+            form_upload=form_upload, form_example=form_example, examples=examples)
 
 @app.errorhandler(404)
 def page_not_found(e):
