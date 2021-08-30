@@ -15,5 +15,3 @@ class FilesForm(FlaskForm):
     task = SelectField('Task', choices=['Classification', 'Tagging'], validators=[Required()])
     submit = SubmitField('Submit')
 
-class ExampleForm(FlaskForm):
-    pass

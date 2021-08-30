@@ -4,7 +4,7 @@ import base64
 import requests
 from flask import render_template, redirect, url_for, escape, request
 from app import app
-from app.forms import URLForm, FilesForm, ExampleForm
+from app.forms import URLForm, FilesForm
 from app.utils import perform_url_request, perform_upload_request
 
 
@@ -73,7 +73,7 @@ def url():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     form_upload = FilesForm()
-    form_example = ExampleForm()
+
     examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_upload.validate_on_submit():
@@ -83,27 +83,23 @@ def upload():
                                res=result, task=form_upload.task.data.lower())
 
     return render_template('files.html', title='Upload', 
-            form_upload=form_upload, form_example=form_example, examples=examples)
+            form=form_upload, examples=examples)
 
 
 @app.route('/example', methods=['POST'])
 def example():
     form_upload = FilesForm()
-    form_example = ExampleForm()
-    examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
-    if form_example.validate_on_submit():
-        image_path = os.path.join('static/images', request.form.get('example'))
-        with app.open_resource(image_path, 'rb') as f:
-            f.mimetype = 'image/jpeg'
-            result = perform_upload_request([f, ], 'classification')
+    #examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
+
+    image_path = os.path.join('static/images', request.form.get('example'))
+    with app.open_resource(image_path, 'rb') as f:
+        f.mimetype = 'image/jpeg'
+        result = perform_upload_request([f, ], form_upload.task.data.lower())
 #        return render_template('result.html', title='Results',
 #                               res=result, task=form_upload.task.data.lower())
-        return render_template('result.html', title='Results',
-                               res=result, task='classification')
-
-    return render_template('files.html', title='Upload', 
-            form_upload=form_upload, form_example=form_example, examples=examples)
+    return render_template('result.html', title='Results',
+                           res=result, task=form_upload.task.data.lower())
 
 @app.errorhandler(404)
 def page_not_found(e):
