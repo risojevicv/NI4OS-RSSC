@@ -1,3 +1,4 @@
+#FROM tiangolo/uwsgi-nginx-flask:python3.8
 FROM tiangolo/uwsgi-nginx-flask:python3.8-alpine
 RUN apk --update add bash nano make automake gcc g++ subversion python3-dev
 ENV STATIC_URL /static
