@@ -2,11 +2,12 @@ import os
 import json
 import base64
 import requests
-from flask import render_template, redirect, url_for, escape, request
+from flask import render_template, redirect, url_for, escape, request, flash
 from app import app
 from app.forms import URLForm, FilesForm
 from app.utils import perform_url_request, perform_upload_request
 
+MAX_FILES_ALLOWED = 10
 
 @app.route('/url-api', methods=['POST'])
 def url_api():
@@ -77,7 +78,9 @@ def upload():
     examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_upload.validate_on_submit():
-        result = perform_upload_request(form_upload.files.data, form_upload.task.data)
+        if len(form_upload.files.data) > MAX_FILES_ALLOWED:
+            flash('Maximum of {:d} files allowed!'.format(MAX_FILES_ALLOWED))
+        result = perform_upload_request(form_upload.files.data[:MAX_FILES_ALLOWED], form_upload.task.data)
 
         return render_template('result.html', title='Results',
                                res=result, task=form_upload.task.data.lower())

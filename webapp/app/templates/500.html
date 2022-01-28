@@ -3,6 +3,16 @@
 {% block content %}
     <div class="container">
         <h2>An unexpected error has occurred</h2>
+        <p>Additional warnings:</p>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <p><a href="{{ url_for('index') }}">Back</a></p>
     </div>
 {% endblock %}
