@@ -3,9 +3,9 @@
 {% block content %}
     <div class="container">
         <h2>An unexpected error has occurred</h2>
-        <p>Additional warnings:</p>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
+                <p>Additional warnings:</p>
                 <ul>
                 {% for message in messages %}
                     <li>{{ message }}</li>

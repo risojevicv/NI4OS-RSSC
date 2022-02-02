@@ -39,7 +39,7 @@ print('Elapsed time: {:.2f}'.format(time.time() - t0))
 
 print(json.dumps(json_response.json(), indent=4))
 
-results = [{classname: pred for classname, pred in zip(res['classnames'], res['preds'])} for res in json_response.json()['predictions']]
+results = [{classname: pred for classname, pred in zip(res['classnames'], res['probabilities'])} for res in json_response.json()['predictions']]
 
 print(results)
 
