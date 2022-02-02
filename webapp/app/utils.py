@@ -12,11 +12,10 @@ def parse_response(json_response, task='classification'):
     response = []
 
     for i, prediction in enumerate(json_response):
-        preds = prediction['preds']
-        #idxs = np.array(preds).argsort()[:-6:-1]
+        #preds = prediction['probabilities']
 
         keys = np.array(prediction['classnames'])
-        values = np.array(prediction['preds'])
+        values = np.array(prediction['probabilities'])
         values *= 100
         values = values.astype(np.uint8)
 

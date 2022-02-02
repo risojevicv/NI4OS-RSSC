@@ -24,7 +24,7 @@ class ClassifyJPEG(tf.Module):
         imgs = tf.image.resize(imgs_map, [256, 256])
         img_float = tf.cast(imgs, dtype=tf.float32) / 255.0
 
-        return {'preds': self.clf(img_float),
+        return {'probabilities': self.clf(img_float),
                 'classnames': tf.tile(self.class_index, [len(imgs), 1])}
 
 version = 1

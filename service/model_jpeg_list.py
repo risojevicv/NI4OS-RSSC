@@ -20,7 +20,7 @@ class ClassifyJPEG(tf.Module):
         out = tf.keras.layers.Dense(45, activation='softmax')(x)
 
         self.clf = tf.keras.models.Model(base_model.input, out)
-        self.clf.load_weights('resnet50_nwpu_adam_random_crop_batch100_epochs144.h5')
+        self.clf.load_weights('models/resnet50_nwpu_adam_random_crop_batch100_epochs144.h5')
 
     @tf.function(input_signature=[tf.TensorSpec([None,], tf.string)])
     def __call__(self, string_inp):
@@ -32,11 +32,11 @@ class ClassifyJPEG(tf.Module):
         imgs = tf.image.resize(imgs_map, [256, 256])
         img_float = tf.cast(imgs, dtype=tf.float32) / 255.0
 
-        return {'preds': self.clf(img_float),
+        return {'probabilities': self.clf(img_float),
                 'classnames': tf.tile(self.class_index, [len(imgs), 1])}
 
 version = 1
-export_path = os.path.join('models', str(version))
+export_path = os.path.join('models/rssc', str(version))
 
 #tf.config.threading.set_intra_op_parallelism_threads(0)
 #tf.config.threading.set_inter_op_parallelism_threads(0)
