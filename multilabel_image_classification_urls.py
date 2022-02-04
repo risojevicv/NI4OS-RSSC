@@ -13,8 +13,8 @@ import requests
 import json
 import time
 
-test_urls = [r'https://drive.etfbl.net/s/Wat52qcpm5P9YzC/preview',
-             r'https://drive.etfbl.net/s/ZjpLszJDBopfCWk/preview']
+test_urls = [r'https://raw.githubusercontent.com/risojevicv/NI4OS-RSSC/main/webapp/app/static/images/mediumresidential_58.jpg',
+             r'https://raw.githubusercontent.com/risojevicv/NI4OS-RSSC/main/webapp/app/static/images/bridge_22.jpg']
 
 headers = {'content-type': 'application/x-www-form-urlencoded'}
 data = 'urls=' + ','.join(test_urls)
