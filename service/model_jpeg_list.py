@@ -27,7 +27,9 @@ class ClassifyJPEG(tf.Module):
         imgs_map = tf.map_fn(
                              tf.io.decode_image,
                              string_inp,
-                             dtype=tf.uint8)
+                             dtype=tf.uint8
+                             #fn_output_signature=tf.RaggedTensorSpec(shape=[None, None, None, 3], dtype=tf.uint8)
+                             )
         imgs_map.set_shape((None, None, None, 3))
         imgs = tf.image.resize(imgs_map, [256, 256])
         img_float = tf.cast(imgs, dtype=tf.float32) / 255.0
