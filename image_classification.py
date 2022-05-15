@@ -18,7 +18,7 @@ import time
 #               'webapp/app/static/images/farmland_52.jpg',
 #               'webapp/app/static/images/bridge_22.jpg',
 #               'webapp/app/static/images/storagetanks_1.jpg']
-test_paths = ['/home/research/vlado/data/AID_jpeg/Airport/airport_17.jpg']
+test_paths = ['/home/vlado/dl/data/AID/Airport/airport_17.jpg']
 
 headers = {'content-type': 'application/json'}
 req = {'signature_name': 'serving_default', 
