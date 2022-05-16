@@ -1,3 +1,4 @@
+from urllib import request
 import requests
 from app.models import NI4OSResult, NI4OSData
 import numpy as np
@@ -29,6 +30,9 @@ def parse_response(json_response, task='classification'):
         elif task.lower() == 'tagging':
             top_keys = top_keys[top_values>50]
             top_values = top_values[top_values>50]
+        elif task.lower() == 'patches classification':
+            top_keys = top_keys[:5]
+            top_values = top_values[:5]
 
         response.append(dict(zip(top_keys, top_values)))
 
@@ -71,7 +75,6 @@ def perform_upload_request(forms_data, task='classification'):
 
     for data in forms_data:
         data_bytes = base64.b64encode(data.read()).decode('utf-8')
-        result.append(NI4OSResult(data_bytes, data.mimetype))
         req['instances'].append({'b64': data_bytes})
 
     data_to_send = json.dumps(req)
@@ -84,10 +87,15 @@ def perform_upload_request(forms_data, task='classification'):
         json_response = requests.post('http://localhost/multilabel-upload-api',
                                     headers = headers,
                                     data=data_to_send)
+    elif task.lower() == 'patches classification':
+        json_response = requests.post('http://localhost/upload-api-patches',
+                                    headers=headers,
+                                    data=data_to_send)
 
     response = parse_response(json_response, task)
 
     for i, out in enumerate(response):
+        result.append(NI4OSResult(data_bytes, data.mimetype))
         result[i].results = out
 
     return result
