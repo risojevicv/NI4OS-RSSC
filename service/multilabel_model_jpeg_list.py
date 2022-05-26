@@ -3,6 +3,9 @@ import json
 import numpy as np
 import tensorflow as tf
 
+WIDTH = 256
+HEIGHT = 256
+
 class ClassifyJPEG(tf.Module):
     def __init__(self):
         super(ClassifyJPEG, self).__init__()
@@ -18,7 +21,7 @@ class ClassifyJPEG(tf.Module):
     def __load_preprocess(self, inp):
         img = tf.io.decode_image(inp)
         img.set_shape((None, None, 3))
-        img = tf.image.resize(img, [256, 256])
+        img = tf.image.resize(img, [HEIGHT, WIDTH])
         means = tf.constant(np.reshape([123.68, 116.779, 103.939], (1, 1, 3)),
                             dtype=tf.float32)
         img = tf.math.subtract(img, means)       

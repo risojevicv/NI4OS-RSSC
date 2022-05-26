@@ -1,10 +1,14 @@
-from urllib import request
-import requests
-from app.models import NI4OSResult, NI4OSData
-import numpy as np
-import base64
+import io
 import json
+import base64
+import requests
+import numpy as np
+from PIL import Image
+from urllib import request
+from app.models import NI4OSResult, NI4OSData
 
+WIDTH = 256
+HEIGHT = 256
 
 def parse_response(json_response, task='classification'):
     json_response = json_response.json()
@@ -31,8 +35,8 @@ def parse_response(json_response, task='classification'):
             top_keys = top_keys[top_values>50]
             top_values = top_values[top_values>50]
         elif task.lower() == 'patches classification':
-            top_keys = top_keys[:5]
-            top_values = top_values[:5]
+            top_keys = top_keys[top_values>10]
+            top_values = top_values[top_values>10]
 
         response.append(dict(zip(top_keys, top_values)))
 
@@ -72,11 +76,24 @@ def perform_upload_request(forms_data, task='classification'):
     req = {'signature_name': 'serving_default', 'instances': []}
 
     result = []
-
     for data in forms_data:
-        data_bytes = base64.b64encode(data.read()).decode('utf-8')
-        req['instances'].append({'b64': data_bytes})
+        data_bytes = data.read()
+        data_enc = base64.b64encode(data_bytes).decode('utf-8')
+        req['instances'].append({'b64': data_enc})
 
+        if task.lower() == 'patches classification':
+            img = Image.open(io.BytesIO(data_bytes))
+            for j in range(0, img.size[1]-HEIGHT+1, HEIGHT):
+                for i in range(0, img.size[0]-WIDTH+1, WIDTH):
+                    patch = img.crop((i, j, i+WIDTH, j+HEIGHT))
+                    patch_jpeg = io.BytesIO()
+                    patch.save(patch_jpeg, 'JPEG')
+                    patch_jpeg.seek(0)
+                    result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
+        else:
+            result.append(NI4OSResult(data_enc, data.mimetype))
+
+    print(len(result))
     data_to_send = json.dumps(req)
 
     if task.lower() == 'classification':
@@ -94,8 +111,7 @@ def perform_upload_request(forms_data, task='classification'):
 
     response = parse_response(json_response, task)
 
-    for i, out in enumerate(response):
-        result.append(NI4OSResult(data_bytes, data.mimetype))
-        result[i].results = out
+    for k, res in enumerate(response):
+        result[k].results = res
 
     return result
