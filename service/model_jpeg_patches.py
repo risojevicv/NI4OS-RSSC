@@ -5,16 +5,21 @@ import tensorflow as tf
 
 WIDTH = 256
 HEIGHT = 256
+NUM_CLC_CLASSES = 6
 
 class ClassifyJPEG(tf.Module):
     def __init__(self):
         super(ClassifyJPEG, self).__init__()
         #tf.keras.backend.set_learning_phase(0)
 
-        class_index = json.load(open('nwpu_class_index.json'))
+        class_index = json.load(open('clc_class_index.json'))       
         self.class_index = tf.constant(list(class_index.values()),
                                        dtype=tf.string,
-                                       shape=(1, 45))
+                                       shape=(1, 6))
+        class_mapping = json.load(open('nwpu_clc_map.json'))
+        self.class_mapping = tf.constant(list(class_mapping.values()),
+                                         dtype=tf.int32,
+                                         shape=(45,))
 
         # base_model = tf.keras.applications.resnet50.ResNet50(weights=None,
         #                                                      include_top=False,
@@ -52,7 +57,11 @@ class ClassifyJPEG(tf.Module):
                          fn_output_signature=tf.float32
                         )
         imgs = tf.reshape(imgs, [-1, HEIGHT, WIDTH, 3])
-        return {'probabilities': self.clf(imgs),
+        proba = tf.transpose(self.clf(imgs))
+        proba = tf.math.unsorted_segment_sum(proba, self.class_mapping, num_segments=NUM_CLC_CLASSES)
+        proba = tf.transpose(proba)
+
+        return {'probabilities': proba,
                 'classnames': tf.tile(self.class_index, [tf.shape(imgs)[0], 1])}
 
 version = 1
