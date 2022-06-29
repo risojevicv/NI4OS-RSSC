@@ -1,4 +1,5 @@
 import io
+import os
 import json
 import base64
 import requests
@@ -93,7 +94,6 @@ def perform_upload_request(forms_data, task='classification'):
         else:
             result.append(NI4OSResult(data_enc, data.mimetype))
 
-    print(len(result))
     data_to_send = json.dumps(req)
 
     if task.lower() == 'classification':
@@ -108,10 +108,37 @@ def perform_upload_request(forms_data, task='classification'):
         json_response = requests.post('http://localhost/upload-api-patches',
                                     headers=headers,
                                     data=data_to_send)
+    elif task.lower() == 'patches again':
+        json_response = requests.post('http://localhost/upload-api-patches',
+                                    headers=headers,
+                                    data=data_to_send)
 
     response = parse_response(json_response, task)
 
-    for k, res in enumerate(response):
-        result[k].results = res
+    if task.lower() == 'patches again':
+        ROOT = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
+            clc_class_colors = json.load(f)
+        img_bytes = data_bytes # Only a temporary solution. Won't work with multiple request images!
+        img = Image.open(io.BytesIO(img_bytes))
+        labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
+        k = 0
+        for j in range(0, img.height-HEIGHT+1, HEIGHT):
+            for i in range(0, img.width-WIDTH+1, WIDTH):
+                cls = list(response[k].keys())[0]
+                color_code = clc_class_colors[cls]
+                labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
+                k += 1
+        print(labelmap.shape, labelmap.dtype)
+        labeled = Image.fromarray(labelmap)
+        labeled = Image.blend(labeled, img, 0.5)
+        labeled_jpeg = io.BytesIO()
+        labeled.save(labeled_jpeg, 'JPEG')
+        labeled_jpeg.seek(0)
+        result[0].image = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')
+        result[0].results = response[0]
+    else:
+        for k, res in enumerate(response):
+            result[k].results = res
 
     return result
