@@ -77,12 +77,14 @@ def perform_upload_request(forms_data, task='classification'):
     req = {'signature_name': 'serving_default', 'instances': []}
 
     result = []
+    labeled_jpeg = None
+
     for data in forms_data:
         data_bytes = data.read()
         data_enc = base64.b64encode(data_bytes).decode('utf-8')
         req['instances'].append({'b64': data_enc})
 
-        if task.lower() == 'patches classification':
+        if task.lower().startswith('patches'):
             img = Image.open(io.BytesIO(data_bytes))
             for j in range(0, img.size[1]-HEIGHT+1, HEIGHT):
                 for i in range(0, img.size[0]-WIDTH+1, WIDTH):
@@ -135,10 +137,10 @@ def perform_upload_request(forms_data, task='classification'):
         labeled_jpeg = io.BytesIO()
         labeled.save(labeled_jpeg, 'JPEG')
         labeled_jpeg.seek(0)
-        result[0].image = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')
-        result[0].results = response[0]
-    else:
-        for k, res in enumerate(response):
-            result[k].results = res
+        labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')
+   
+    print(len(result), len(response))
+    for k, res in enumerate(response):
+        result[k].results = res
 
-    return result
+    return result, labeled_jpeg

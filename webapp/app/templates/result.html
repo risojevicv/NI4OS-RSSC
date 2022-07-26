@@ -8,6 +8,13 @@
             <h2 style="font-family: roboto;">Classification results</h2>
         {% endif %}
         <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
+        {% if labeled %}
+        <div class="row border bg-light">
+            <div class="col-md-4 justify-content-center">
+                <img src="data:image/jpeg;base64, {{ labeled }}" class="py-md-1 mx-auto d-block" style="max-height: 600px; max-width: 600px; position: relative; top: 50%; transform: translateY(-50%);">
+            </div>
+        </div>
+        {% endif %}
         {% for item in res %}
         <div class="row border bg-light">
             <div class="col-md-4 justify-content-center">

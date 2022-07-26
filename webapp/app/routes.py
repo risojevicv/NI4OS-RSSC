@@ -86,10 +86,10 @@ def upload():
     if form_upload.validate_on_submit():
         if len(form_upload.files.data) > MAX_FILES_ALLOWED:
             flash('Maximum of {:d} files allowed!'.format(MAX_FILES_ALLOWED))
-        result = perform_upload_request(form_upload.files.data[:MAX_FILES_ALLOWED], form_upload.task.data)
+        result, labeled = perform_upload_request(form_upload.files.data[:MAX_FILES_ALLOWED], form_upload.task.data)
 
         return render_template('result.html', title='Results',
-                               res=result, task=form_upload.task.data.lower())
+                               res=result, labeled=labeled, task=form_upload.task.data.lower())
 
     return render_template('files.html', title='Upload', 
             form=form_upload, examples=examples)
@@ -106,10 +106,10 @@ def example():
         image_path = os.path.join('static/images', ex)
         with app.open_resource(image_path, 'rb') as f:
             f.mimetype = 'image/jpeg'
-            result = perform_upload_request([f, ], form_upload.task.data.lower())
+            result, labeled = perform_upload_request([f, ], form_upload.task.data.lower())
 
             return render_template('result.html', title='Results',
-                                    res=result, task=form_upload.task.data.lower())
+                                    res=result, labeled=labeled, task=form_upload.task.data.lower())
     else:
         return render_template('files.html', title='Upload', 
                 form=form_upload, examples=examples)
