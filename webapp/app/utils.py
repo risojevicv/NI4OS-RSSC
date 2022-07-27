@@ -35,7 +35,7 @@ def parse_response(json_response, task='classification'):
         elif task.lower() == 'tagging':
             top_keys = top_keys[top_values>50]
             top_values = top_values[top_values>50]
-        elif task.lower() == 'patches classification':
+        elif task.lower().startswith('patches'):
             top_keys = top_keys[top_values>10]
             top_values = top_values[top_values>10]
 
@@ -123,6 +123,9 @@ def perform_upload_request(forms_data, task='classification'):
             clc_class_colors = json.load(f)
         img_bytes = data_bytes # Only a temporary solution. Won't work with multiple request images!
         img = Image.open(io.BytesIO(img_bytes))
+        newheight = img.height // HEIGHT * HEIGHT
+        newwidth = img.width // WIDTH * WIDTH
+        img = img.crop((0, 0, newwidth, newheight))
         labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
         k = 0
         for j in range(0, img.height-HEIGHT+1, HEIGHT):
