@@ -84,16 +84,7 @@ def perform_upload_request(forms_data, task='classification'):
         data_enc = base64.b64encode(data_bytes).decode('utf-8')
         req['instances'].append({'b64': data_enc})
 
-        if task.lower().startswith('patches'):
-            img = Image.open(io.BytesIO(data_bytes))
-            for j in range(0, img.size[1]-HEIGHT+1, HEIGHT):
-                for i in range(0, img.size[0]-WIDTH+1, WIDTH):
-                    patch = img.crop((i, j, i+WIDTH, j+HEIGHT))
-                    patch_jpeg = io.BytesIO()
-                    patch.save(patch_jpeg, 'JPEG')
-                    patch_jpeg.seek(0)
-                    result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
-        else:
+        if not task.lower().startswith('patches'):
             result.append(NI4OSResult(data_enc, data.mimetype))
 
     data_to_send = json.dumps(req)
@@ -117,31 +108,42 @@ def perform_upload_request(forms_data, task='classification'):
 
     response = parse_response(json_response, task)
 
-    if task.lower() == 'patches again':
+    print(len(result))
+
+    if task.lower().startswith('patches'):
         ROOT = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
             clc_class_colors = json.load(f)
-        img_bytes = data_bytes # Only a temporary solution. Won't work with multiple request images!
-        img = Image.open(io.BytesIO(img_bytes))
-        newheight = img.height // HEIGHT * HEIGHT
-        newwidth = img.width // WIDTH * WIDTH
-        img = img.crop((0, 0, newwidth, newheight))
-        labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
-        k = 0
-        for j in range(0, img.height-HEIGHT+1, HEIGHT):
-            for i in range(0, img.width-WIDTH+1, WIDTH):
-                cls = list(response[k].keys())[0]
-                color_code = clc_class_colors[cls]
-                labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
-                k += 1
-        print(labelmap.shape, labelmap.dtype)
-        labeled = Image.fromarray(labelmap)
-        labeled = Image.blend(labeled, img, 0.5)
-        labeled_jpeg = io.BytesIO()
-        labeled.save(labeled_jpeg, 'JPEG')
-        labeled_jpeg.seek(0)
-        labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')
-   
+
+        for data in forms_data:
+            img = Image.open(data)
+            newheight = img.height // HEIGHT * HEIGHT
+            newwidth = img.width // WIDTH * WIDTH
+            img = img.crop((0, 0, newwidth, newheight))
+            labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
+            k = 0
+            for j in range(0, img.height-HEIGHT+1, HEIGHT):
+                for i in range(0, img.width-WIDTH+1, WIDTH):
+                    patch = img.crop((i, j, i+WIDTH, j+HEIGHT))
+                    patch_jpeg = io.BytesIO()
+                    patch.save(patch_jpeg, 'JPEG')
+                    result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
+                    
+                    if task.lower() == 'patches again':
+                        cls = list(response[k].keys())[0]
+                        color_code = clc_class_colors[cls]
+                        labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
+                        k += 1
+
+            if task.lower() == 'patches again':
+                print(labelmap.shape, labelmap.dtype)
+                labeled = Image.fromarray(labelmap)
+                labeled = Image.blend(labeled, img, 0.5)
+                labeled_jpeg = io.BytesIO()
+                labeled.save(labeled_jpeg, 'JPEG')
+                labeled_jpeg.seek(0)
+                labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')    
+             
     print(len(result), len(response))
     for k, res in enumerate(response):
         result[k].results = res
