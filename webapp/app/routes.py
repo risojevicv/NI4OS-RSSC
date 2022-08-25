@@ -8,6 +8,7 @@ from app.forms import URLForm, FilesForm
 from app.utils import perform_url_request, perform_upload_request
 
 MAX_FILES_ALLOWED = 10
+MAX_FILES_ALLOWED_PATCHES = 1
 
 @app.route('/url-api', methods=['POST'])
 def url_api():
@@ -84,9 +85,10 @@ def upload():
     examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_upload.validate_on_submit():
-        if len(form_upload.files.data) > MAX_FILES_ALLOWED:
-            flash('Maximum of {:d} files allowed!'.format(MAX_FILES_ALLOWED))
-        result, labeled = perform_upload_request(form_upload.files.data[:MAX_FILES_ALLOWED], form_upload.task.data)
+        max_files = MAX_FILES_ALLOWED_PATCHES if form_upload.task.data.lower().startswith('patches') else MAX_FILES_ALLOWED
+        if len(form_upload.files.data) > max_files:
+            flash('Maximum of {:d} files allowed!'.format(max_files))
+        result, labeled = perform_upload_request(form_upload.files.data[:max_files], form_upload.task.data)
 
         return render_template('result.html', title='Results',
                                res=result, labeled=labeled, task=form_upload.task.data.lower())

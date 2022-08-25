@@ -127,14 +127,13 @@ def perform_upload_request(forms_data, task='classification'):
                     patch.save(patch_jpeg, 'JPEG')
                     result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
                     
-                    if task.lower() == 'patches again':
-                        print(list(response[k].keys()))
+                    if task.lower() == 'patches classification':
                         cls = list(response[k].keys())[0]
                         color_code = clc_class_colors[cls]
                         labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
                         k += 1
 
-            if task.lower() == 'patches again':
+            if task.lower() == 'patches classification':
                 labeled = Image.fromarray(labelmap)
                 labeled = Image.blend(labeled, img, 0.5)
                 labeled_jpeg = io.BytesIO()
