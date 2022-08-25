@@ -108,8 +108,6 @@ def perform_upload_request(forms_data, task='classification'):
 
     response = parse_response(json_response, task)
 
-    print(len(result))
-
     if task.lower().startswith('patches'):
         ROOT = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
@@ -130,13 +128,13 @@ def perform_upload_request(forms_data, task='classification'):
                     result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
                     
                     if task.lower() == 'patches again':
+                        print(list(response[k].keys()))
                         cls = list(response[k].keys())[0]
                         color_code = clc_class_colors[cls]
                         labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
                         k += 1
 
             if task.lower() == 'patches again':
-                print(labelmap.shape, labelmap.dtype)
                 labeled = Image.fromarray(labelmap)
                 labeled = Image.blend(labeled, img, 0.5)
                 labeled_jpeg = io.BytesIO()
@@ -144,7 +142,6 @@ def perform_upload_request(forms_data, task='classification'):
                 labeled_jpeg.seek(0)
                 labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')    
              
-    print(len(result), len(response))
     for k, res in enumerate(response):
         result[k].results = res
 

@@ -12,7 +12,7 @@ class ClassifyJPEG(tf.Module):
         super(ClassifyJPEG, self).__init__()
         #tf.keras.backend.set_learning_phase(0)
 
-        class_index = json.load(open('clc_class_index.json'))       
+        class_index = json.load(open('clc_class_index.json'))   
         self.class_index = tf.constant(list(class_index.values()),
                                        dtype=tf.string,
                                        shape=(1, 6))
