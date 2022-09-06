@@ -3,4 +3,4 @@
  "forest and semi-natural areas": [0, 128, 0],
  "wetlands": [87, 155, 219],
  "water bodies": [0, 98, 255],
- "clouds": [35, 31, 32]}
+ "clouds": [255, 253, 161]}

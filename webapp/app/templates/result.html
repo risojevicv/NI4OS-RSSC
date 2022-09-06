@@ -9,7 +9,7 @@
         {% endif %}
         <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
         {% if labeled %}
-        <div class="row border bg-light align-items-center">
+        <div class="row border bg-light align-items-center sticky-top">
             <div class="col-8 justify-content-center">
                 <img src="data:image/jpeg;base64, {{ labeled }}" class="py-md-1 mx-auto d-block" style="max-height: 600px; max-width: 600px; position: relative; top: 50%;">
             </div>
@@ -37,7 +37,7 @@
                     </tr>
                     <tr>
                         <td>clouds</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(35, 31, 32); width: 20px; height: 20px; border: 1px solid gray"></div></td>
+                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(255, 253, 161); width: 20px; height: 20px; border: 1px solid gray"></div></td>
                     </tr>
                 </table>
             </div>
