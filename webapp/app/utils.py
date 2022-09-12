@@ -18,7 +18,6 @@ def parse_response(json_response, task='classification'):
     response = []
 
     for i, prediction in enumerate(json_response):
-        #preds = prediction['probabilities']
 
         keys = np.array(prediction['classnames'])
         values = np.array(prediction['probabilities'])
@@ -144,5 +143,7 @@ def perform_upload_request(forms_data, task='classification'):
              
     for k, res in enumerate(response):
         result[k].results = res
+    
+    print(result[0].results)
 
     return result, labeled_jpeg, clc_class_colors

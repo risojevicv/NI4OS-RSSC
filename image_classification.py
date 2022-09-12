@@ -14,11 +14,10 @@ import json
 import base64
 import time
 
-# test_paths = ['webapp/app/static/images/mediumresidential_58.jpg',
-#               'webapp/app/static/images/farmland_52.jpg',
-#               'webapp/app/static/images/bridge_22.jpg',
-#               'webapp/app/static/images/storagetanks_1.jpg']
-test_paths = ['/home/vlado/dl/data/AID/Airport/airport_17.jpg']
+test_paths = ['webapp/app/static/images/mediumresidential_58.jpg',
+              'webapp/app/static/images/farmland_52.jpg',
+              'webapp/app/static/images/bridge_22.jpg',
+              'webapp/app/static/images/storagetanks_1.jpg']
 
 headers = {'content-type': 'application/json'}
 req = {'signature_name': 'serving_default', 
