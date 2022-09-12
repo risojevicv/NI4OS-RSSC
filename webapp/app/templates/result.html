@@ -15,30 +15,12 @@
             <div class="col justify-content-center">
                 <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
                 <table class="table table-bordered table-sm">
-                    <tr>
-                        <td>artificial surfaces</td>    
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(219, 95, 87); width: 20px; height: 20px; border: 1px solid gray"></div></td> 
-                    </tr>
-                    <tr>
-                        <td>agricultural areas</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(123, 196, 123); width: 20px; height: 20px; border: 1px solid gray"></div></td>
-                    </tr>
-                    <tr>
-                        <td>forest and semi-natural areas</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(0, 128, 0); width: 20px; height: 20px; border: 1px solid gray"></div></td>
-                    </tr>
-                    <tr>
-                        <td>wetlands</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(87, 155, 219); width: 20px; height: 20px; border: 1px solid gray"></div></td>
-                    </tr>
-                    <tr>
-                        <td>water bodies</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(0, 98, 255); width: 20px; height: 20px; border: 1px solid gray"></div></td>
-                    </tr>
-                    <tr>
-                        <td>clouds</td>
-                        <td class="align-middle"><div class="mx-auto" style="background-color: rgb(255, 253, 161); width: 20px; height: 20px; border: 1px solid gray"></div></td>
-                    </tr>
+                    {% for class, color in colors.items() %}
+                        <tr>
+                            <td>{{ class }}</td>    
+                            <td class="align-middle"><div class="mx-auto" style="background-color: rgb{{ color | replace("[", "(") | replace("]", ")") }};; width: 20px; height: 20px; border: 1px solid gray"></div></td> 
+                        </tr>
+                    {% endfor %}
                 </table>
             </div>
         </div>
