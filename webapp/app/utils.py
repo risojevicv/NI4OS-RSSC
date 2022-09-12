@@ -78,6 +78,7 @@ def perform_upload_request(forms_data, task='classification'):
 
     result = []
     labeled_jpeg = None
+    clc_class_colors = None
 
     for data in forms_data:
         data_bytes = data.read()
@@ -144,4 +145,4 @@ def perform_upload_request(forms_data, task='classification'):
     for k, res in enumerate(response):
         result[k].results = res
 
-    return result, labeled_jpeg
+    return result, labeled_jpeg, clc_class_colors

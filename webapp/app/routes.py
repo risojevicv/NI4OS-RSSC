@@ -88,10 +88,10 @@ def upload():
         max_files = MAX_FILES_ALLOWED_PATCHES if form_upload.task.data.lower().startswith('patches') else MAX_FILES_ALLOWED
         if len(form_upload.files.data) > max_files:
             flash('Maximum of {:d} files allowed!'.format(max_files))
-        result, labeled = perform_upload_request(form_upload.files.data[:max_files], form_upload.task.data)
+        result, labeled, colors = perform_upload_request(form_upload.files.data[:max_files], form_upload.task.data)
 
         return render_template('result.html', title='Results',
-                               res=result, labeled=labeled, task=form_upload.task.data.lower())
+                               res=result, labeled=labeled, colors=colors, task=form_upload.task.data.lower())
 
     return render_template('files.html', title='Upload', 
             form=form_upload, examples=examples)
@@ -108,10 +108,10 @@ def example():
         image_path = os.path.join('static/images', ex)
         with app.open_resource(image_path, 'rb') as f:
             f.mimetype = 'image/jpeg'
-            result, labeled = perform_upload_request([f, ], form_upload.task.data.lower())
+            result, labeled, colors = perform_upload_request([f, ], form_upload.task.data.lower())
 
             return render_template('result.html', title='Results',
-                                    res=result, labeled=labeled, task=form_upload.task.data.lower())
+                                    res=result, labeled=labeled, colors=colors, task=form_upload.task.data.lower())
     else:
         return render_template('files.html', title='Upload', 
                 form=form_upload, examples=examples)

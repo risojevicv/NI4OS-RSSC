@@ -62,8 +62,12 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="progress position-relative" style="height: 28px;">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                    <small class="justify-content-center d-flex position-absolute w-100" style="line-height: 28px; font-size: 16px;">{{ value }}%</small>
+                                    {% if labeled %}
+                                        <div class="progress-bar" role="progressbar" style="background-color: rgb{{ [colors][0][class] | replace("[", "(") | replace("]", ")") }}; width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% else %}
+                                        <div class="progress-bar" role="progressbar" style="width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% endif %}
+                                        <small class="justify-content-center d-flex position-absolute w-100" style="line-height: 28px; font-size: 16px;">{{ value }}%</small>
                                 </div>
                             </div>
                         </div>
