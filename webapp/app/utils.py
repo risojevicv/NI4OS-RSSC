@@ -101,10 +101,6 @@ def perform_upload_request(forms_data, task='classification'):
         json_response = requests.post('http://localhost/upload-api-patches',
                                     headers=headers,
                                     data=data_to_send)
-    elif task.lower() == 'patches again':
-        json_response = requests.post('http://localhost/upload-api-patches',
-                                    headers=headers,
-                                    data=data_to_send)
 
     response = parse_response(json_response, task)
 
@@ -143,7 +139,5 @@ def perform_upload_request(forms_data, task='classification'):
              
     for k, res in enumerate(response):
         result[k].results = res
-    
-    print(result[0].results)
 
     return result, labeled_jpeg, clc_class_colors
