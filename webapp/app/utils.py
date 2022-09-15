@@ -34,7 +34,7 @@ def parse_response(json_response, task='classification'):
         elif task.lower() == 'tagging':
             top_keys = top_keys[top_values>50]
             top_values = top_values[top_values>50]
-        elif task.lower().startswith('patches'):
+        elif task.lower().startswith('patch'):
             top_keys = top_keys[top_values>10]
             top_values = top_values[top_values>10]
 
@@ -84,7 +84,7 @@ def perform_upload_request(forms_data, task='classification'):
         data_enc = base64.b64encode(data_bytes).decode('utf-8')
         req['instances'].append({'b64': data_enc})
 
-        if not task.lower().startswith('patches'):
+        if not task.lower().startswith('patch'):
             result.append(NI4OSResult(data_enc, data.mimetype))
 
     data_to_send = json.dumps(req)
@@ -97,14 +97,14 @@ def perform_upload_request(forms_data, task='classification'):
         json_response = requests.post('http://localhost/multilabel-upload-api',
                                     headers = headers,
                                     data=data_to_send)
-    elif task.lower() == 'patches classification':
+    elif task.lower() == 'patch-based classification':
         json_response = requests.post('http://localhost/upload-api-patches',
                                     headers=headers,
                                     data=data_to_send)
 
     response = parse_response(json_response, task)
 
-    if task.lower().startswith('patches'):
+    if task.lower().startswith('patch'):
         ROOT = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
             clc_class_colors = json.load(f)
@@ -123,13 +123,13 @@ def perform_upload_request(forms_data, task='classification'):
                     patch.save(patch_jpeg, 'JPEG')
                     result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
                     
-                    if task.lower() == 'patches classification':
+                    if task.lower() == 'patch-based classification':
                         cls = list(response[k].keys())[0]
                         color_code = clc_class_colors[cls]
                         labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
                         k += 1
 
-            if task.lower() == 'patches classification':
+            if task.lower() == 'patch-based classification':
                 labeled = Image.fromarray(labelmap)
                 labeled = Image.blend(labeled, img, 0.5)
                 labeled_jpeg = io.BytesIO()

@@ -31,6 +31,7 @@ class ClassifyJPEG(tf.Module):
         # self.clf = tf.keras.models.Model(base_model.input, out)
         # self.clf.load_weights('models/rssc_resnet50_imagenet_MLRSNet80_ft.h5')
         self.clf = tf.keras.models.load_model('models/rssc_resnet50_imagenet_NWPU80_ft.h5')
+        # self.clf = tf.keras.models.load_model('models/rssc_resnet50_NWPU80.h5')
 
     def __load_preprocess(self, inp):
         img = tf.io.decode_image(inp)
@@ -42,8 +43,9 @@ class ClassifyJPEG(tf.Module):
                                        rates=[1, 1, 1, 1],
                                        padding='VALID')
         img = tf.reshape(img, [-1, HEIGHT, WIDTH, 3])
+        # img = tf.cast(img, tf.float32) / 255.0
         means = tf.constant(np.reshape([123.68, 116.779, 103.939], (1, 1, 3)),
-                          dtype=tf.float32)
+                            dtype=tf.float32)
         img = tf.cast(img, tf.float32)
         img = tf.math.subtract(img, means)
 

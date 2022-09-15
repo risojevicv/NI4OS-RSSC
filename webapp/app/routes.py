@@ -85,7 +85,7 @@ def upload():
     examples = ['farmland_52.jpg', 'mediumresidential_58.jpg', 'bridge_22.jpg', 'storagetanks_1.jpg']
 
     if form_upload.validate_on_submit():
-        max_files = MAX_FILES_ALLOWED_PATCHES if form_upload.task.data.lower().startswith('patches') else MAX_FILES_ALLOWED
+        max_files = MAX_FILES_ALLOWED_PATCHES if form_upload.task.data.lower().startswith('patch') else MAX_FILES_ALLOWED
         if len(form_upload.files.data) > max_files:
             flash('Maximum of {:d} files allowed!'.format(max_files))
         result, labeled, colors = perform_upload_request(form_upload.files.data[:max_files], form_upload.task.data)
