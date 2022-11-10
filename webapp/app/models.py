@@ -1,8 +1,9 @@
 class NI4OSResult():
-    def __init__(self, image=None, mimetype=None, results=None):
+    def __init__(self, image=None, mimetype=None, results=None, ood=None):
         self.image = image
         self.mimetype = mimetype
         self.results = results
+        self.ood = ood
 
 
 class NI4OSData():

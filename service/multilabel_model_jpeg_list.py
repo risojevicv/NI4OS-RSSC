@@ -17,16 +17,26 @@ class ClassifyJPEG(tf.Module):
                                        shape=(1, 60))
 
         # self.clf = tf.keras.models.load_model('models/rssc_resnet50_imagenet-MLRSNet80_multilabel-ft.h5')
-        self.clf = tf.keras.models.load_model('models/rssc_resnet50_MLRSNet80_multilabel.h5')
+        base_model = tf.keras.models.load_model('models/rssc_resnet50_MLRSNet80_multilabel.h5')
+        backbone = tf.keras.applications.resnet50.ResNet50(weights=None,
+                                                    include_top=False,
+                                                    input_shape=(256, 256, 3),
+                                                    pooling='avg')
+        x = backbone.output
+        out = tf.keras.layers.Dense(60, activation='sigmoid')(x)
+
+        self.clf = tf.keras.models.Model(backbone.input, [out, x])
+        all_weights = base_model.get_weights()
+        self.clf.set_weights(all_weights)
+
     def __load_preprocess(self, inp):
         img = tf.io.decode_image(inp)
         img.set_shape((None, None, 3))
         img = tf.image.resize(img, [HEIGHT, WIDTH])
         img = tf.cast(img, tf.float32) / 255.0
-        # means = tf.constant(np.reshape([123.68, 116.779, 103.939], (1, 1, 3)),
-                            # dtype=tf.float32)
-        # img = tf.cast(img, tf.float32)
-        # img = tf.math.subtract(img, means)       
+        means = tf.constant(np.reshape([0., 0., 0.], (1, 1, 3)),
+                            dtype=tf.float32)
+        img = tf.math.subtract(img, means)       
 
         return img
         
@@ -37,7 +47,9 @@ class ClassifyJPEG(tf.Module):
                          string_inp,
                          fn_output_signature=tf.float32)
 
-        return {'probabilities': self.clf(imgs),
+        proba, features = self.clf(imgs)
+        return {'probabilities': proba,
+                'features': features,
                 'classnames': tf.tile(self.class_index, [tf.shape(imgs)[0], 1])}
 
 version = 1

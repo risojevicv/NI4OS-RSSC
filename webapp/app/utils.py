@@ -5,20 +5,39 @@ import base64
 import requests
 import numpy as np
 from PIL import Image
+from app import ann_index, ann_index_multilabel
 from urllib import request
 from app.models import NI4OSResult, NI4OSData
 
 WIDTH = 256
 HEIGHT = 256
 
+def is_ood(features, task='classification'):
+    # thresholds estimated using AID as ID
+    if task.lower() == 'classification':
+        thr = 0.81553 
+        ann = ann_index
+    elif task.lower() == 'tagging':
+        thr = 0.93
+        ann = ann_index_multilabel
+    
+    ood = []
+    for v in features:
+        _, d = ann.get_nns_by_vector(v, 3, search_k=-1, include_distances=True)
+        ood.append(np.mean(d) > thr)
+    
+    return ood
+
 def parse_response(json_response, task='classification'):
     json_response = json_response.json()
     json_response = json_response['predictions']
 
     response = []
+    features = []
 
     for i, prediction in enumerate(json_response):
 
+        features.append(prediction['features'])
         keys = np.array(prediction['classnames'])
         values = np.array(prediction['probabilities'])
         values *= 100
@@ -40,7 +59,10 @@ def parse_response(json_response, task='classification'):
 
         response.append(dict(zip(top_keys, top_values)))
 
-    return response
+    if not task.lower().startswith('patch'):
+        ood = is_ood(features, task)
+    
+    return response, ood
 
 def perform_url_request(urls, task='classification'):
     if not isinstance(urls, list):
@@ -102,7 +124,7 @@ def perform_upload_request(forms_data, task='classification'):
                                     headers=headers,
                                     data=data_to_send)
 
-    response = parse_response(json_response, task)
+    response, ood = parse_response(json_response, task)
 
     if task.lower().startswith('patch'):
         ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -137,7 +159,8 @@ def perform_upload_request(forms_data, task='classification'):
                 labeled_jpeg.seek(0)
                 labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')    
              
-    for k, res in enumerate(response):
+    for k, (res, ood_flag) in enumerate(zip(response, ood)):
         result[k].results = res
+        result[k].ood = ood_flag
 
     return result, labeled_jpeg, clc_class_colors

@@ -37,30 +37,37 @@
                 {% endif %}
             </div>
             <div class="col-md-8 justify-content-center">
-                {% if item.results.items() | length == 0 %}
+                {% if item.ood %}
+                    <p class="text-center">Possibly not a remote sensing image. <a href="#" onclick="this.parentNode.nextElementSibling.style.display='block'; return false">Show</a> the results anyway.</p>
+                    <div style="display:none">
+                {% else %}
+                    <div>
+                {% endif %}
+                    {% if item.results.items() | length == 0 %}
                     <div class="row py-md-1">
                         <div class="col-md-8 text-right" style="font-family: roboto; font-weight: bold;">
                             It seems that there are no appropriate tags for this image!
                         </div>
                     </div>
-                {% endif %}
-                {% for class, value in item.results.items() %}
-                    <div class="row py-md-1">
-                        <div class="col-md-4 text-right">
-                            <label style="font-family: roboto; font-weight: bold;">{{ class }}</label>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="progress position-relative" style="height: 28px;">
-                                {% if labeled %}
-                                    <div class="progress-bar" role="progressbar" style="background-color: rgb{{ [colors][0][class] | replace("[", "(") | replace("]", ")") }}; width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                {% else %}
-                                    <div class="progress-bar" role="progressbar" style="width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                {% endif %}
-                                    <small class="justify-content-center d-flex position-absolute w-100" style="line-height: 28px; font-size: 16px;">{{ value }}%</small>
+                    {% endif %}
+                    {% for class, value in item.results.items() %}
+                        <div class="row py-md-1">
+                            <div class="col-md-4 text-right">
+                                <label style="font-family: roboto; font-weight: bold;">{{ class }}</label>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="progress position-relative" style="height: 28px;">
+                                    {% if labeled %}
+                                        <div class="progress-bar" role="progressbar" style="background-color: rgb{{ [colors][0][class] | replace("[", "(") | replace("]", ")") }}; width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% else %}
+                                        <div class="progress-bar" role="progressbar" style="width: {{ value }}%; line-height: 28px; font-size: 16px;" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    {% endif %}
+                                        <small class="justify-content-center d-flex position-absolute w-100" style="line-height: 28px; font-size: 16px;">{{ value }}%</small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+                </div>
             </div>
         </div>
         {% endfor %}
