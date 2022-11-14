@@ -34,7 +34,9 @@ You can try the service at https://rs2c.etfbl.net.
 
 For running the service we use Docker and Docker Compose. Please install the latest stable versions of Docker Engine and Docker Compose as per  instructions on https://docs.docker.com/compose/install/.
 
-Directory `service` contains code for building a Docker image with the TensorFlow Serving model. The trained models can be downloaded  [here](https://drive.google.com/drive/folders/1Yp_B--dWDimvJFLA3cssxTrHTcZkV8Hu?usp=sharing) and should be put into `service/models` directory. For training/fine-tuning the models please refer to [this](https://github.com/risojevicv/RSSC-transfer) repository. Directory `webapp` contains code for building a Docker image with the frontend app that can be used for service demonstration as well as the code for wrapping TensorFlow Serving calls. 
+Directory `service` contains code for building a Docker image with the TensorFlow Serving model. The trained models can be downloaded  [here](https://drive.google.com/drive/folders/1Yp_B--dWDimvJFLA3cssxTrHTcZkV8Hu?usp=sharing) and should be put into `service/models` directory. For training/fine-tuning the models please refer to [this](https://github.com/risojevicv/RSSC-transfer) repository. 
+
+Directory `webapp` contains code for building a Docker image with the frontend app that can be used for service demonstration as well as the code for wrapping TensorFlow Serving calls. The index files for k-nearest neighbor-based out-of-distribution detection can be downloaded [here](https://drive.google.com/drive/folders/1NGJjlWclp5bJAvWqY0_zB8l0JAO8nDY9?usp=sharing) and should be put into `webapp/app/knn_indices' directory.
 
 Run the service with `docker-compose up`. 
 
