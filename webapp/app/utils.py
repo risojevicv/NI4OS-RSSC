@@ -13,12 +13,12 @@ WIDTH = 256
 HEIGHT = 256
 
 def is_ood(features, task='classification'):
-    # thresholds estimated using AID as ID
+    # thresholds estimated using AID as ID and Food-5k as OOD
     if task.lower() == 'classification':
-        thr = 0.81553 
+        thr = 0.787 # TNR=0.9, FPR=0.1486
         ann = ann_index
     elif task.lower() == 'tagging':
-        thr = 0.93
+        thr = 0.89 # TNR=0.83, FPR=0.157
         ann = ann_index_multilabel
     
     ood = []

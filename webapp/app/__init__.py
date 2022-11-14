@@ -11,8 +11,8 @@ N_FEATURES = 2048
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 ann_index = AnnoyIndex(N_FEATURES, metric='angular')
-ann_index.load(os.path.join(ROOT, 'training_features.ann'), prefault=True)
+ann_index.load(os.path.join(ROOT, 'knn_indices', 'training_features.ann'), prefault=True)
 ann_index_multilabel = AnnoyIndex(N_FEATURES, metric='angular')
-ann_index_multilabel.load(os.path.join(ROOT, 'training_features_mlrsnet_multilabel_scratch.ann'), prefault=True)
+ann_index_multilabel.load(os.path.join(ROOT, 'knn_indices', 'training_features_mlrsnet_multilabel_scratch.ann'), prefault=True)
 
 from app import routes
