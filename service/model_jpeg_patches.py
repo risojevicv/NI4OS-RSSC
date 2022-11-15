@@ -21,17 +21,18 @@ class ClassifyJPEG(tf.Module):
                                          dtype=tf.int32,
                                          shape=(45,))
 
-        # base_model = tf.keras.applications.resnet50.ResNet50(weights=None,
-        #                                                      include_top=False,
-        #                                                      input_shape=(256, 256, 3))
-        # x = base_model.output
-        # x = tf.keras.layers.GlobalAveragePooling2D()(x)
-        # out = tf.keras.layers.Dense(46, activation='softmax')(x)
+        base_model = tf.keras.models.load_model('models/rssc_resnet50_imagenet_NWPU80_ft.h5')
 
-        # self.clf = tf.keras.models.Model(base_model.input, out)
-        # self.clf.load_weights('models/rssc_resnet50_imagenet_MLRSNet80_ft.h5')
-        self.clf = tf.keras.models.load_model('models/rssc_resnet50_imagenet_NWPU80_ft.h5')
-        # self.clf = tf.keras.models.load_model('models/rssc_resnet50_NWPU80.h5')
+        backbone = tf.keras.applications.resnet50.ResNet50(weights=None,
+                                                           include_top=False,
+                                                           input_shape=(256, 256, 3),
+                                                           pooling='avg')
+        x = backbone.output
+        out = tf.keras.layers.Dense(45, activation='softmax')(x)
+
+        self.clf = tf.keras.models.Model(backbone.input, [out, x])
+        all_weights = base_model.get_weights()
+        self.clf.set_weights(all_weights)
 
     def __load_preprocess(self, inp):
         img = tf.io.decode_image(inp)
@@ -59,12 +60,14 @@ class ClassifyJPEG(tf.Module):
                          fn_output_signature=tf.float32
                         )
         imgs = tf.reshape(imgs, [-1, HEIGHT, WIDTH, 3])
-        proba = tf.transpose(self.clf(imgs))
+        proba, features = self.clf(imgs)
+        proba = tf.transpose(proba)
         proba = tf.math.unsorted_segment_sum(proba, self.class_mapping, num_segments=NUM_CLC_CLASSES)
         proba = tf.transpose(proba)
 
         return {'probabilities': proba,
-                'classnames': tf.tile(self.class_index, [tf.shape(imgs)[0], 1])}
+                'classnames': tf.tile(self.class_index, [tf.shape(imgs)[0], 1]),
+                'features': features}
 
 version = 1
 export_path = os.path.join('models/rssc_patches', str(version))

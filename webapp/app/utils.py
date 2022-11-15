@@ -14,7 +14,8 @@ HEIGHT = 256
 
 def is_ood(features, task='classification'):
     # thresholds estimated using AID as ID and Food-5k as OOD
-    if task.lower() == 'classification':
+    # if task.lower() == 'classification':
+    if 'classification' in task.lower():
         thr = 0.787 # TNR=0.9, FPR=0.1486
         ann = ann_index
     elif task.lower() == 'tagging':
@@ -59,8 +60,8 @@ def parse_response(json_response, task='classification'):
 
         response.append(dict(zip(top_keys, top_values)))
 
-    if not task.lower().startswith('patch'):
-        ood = is_ood(features, task)
+    # if not task.lower().startswith('patch'):
+    ood = is_ood(features, task)
     
     return response, ood
 
