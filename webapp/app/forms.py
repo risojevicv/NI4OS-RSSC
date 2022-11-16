@@ -12,6 +12,7 @@ class URLForm(FlaskForm):
 
 class FilesForm(FlaskForm):
     files = MultipleFileField('Upload images', validators=[DataRequired()])
-    task = SelectField('Task', choices=['Classification', 'Tagging', 'Patch-based classification'], validators=[Required()])
+    task = SelectField('Task', choices=['Classification', 'Tagging', 'Patch-based classification', 
+                                        'Patch-based classification (smoothed)'], validators=[Required()])
     submit = SubmitField('Submit')
 
