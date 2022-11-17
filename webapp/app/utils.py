@@ -28,8 +28,10 @@ from app.models import NI4OSResult, NI4OSData
 
 WIDTH = 256
 HEIGHT = 256
-OVERLAP = 1
-NUM_CLC_CLASSES = 6
+ROOT = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
+    CLC_CLASS_COLORS = json.load(f)
+NUM_CLC_CLASSES = len(CLC_CLASS_COLORS)
 
 def triang(M, sym=True):
 
@@ -129,6 +131,11 @@ def is_ood(features, task='classification'):
     return ood
 
 def parse_response(json_response, task='classification'):
+
+    with open(os.path.join(ROOT, 'nwpu_clc_map.json')) as f:
+        class_mapping = json.load(f)
+    class_mapping = list(class_mapping.values())
+
     json_response = json_response.json()
     json_response = json_response['predictions']
 
@@ -140,6 +147,11 @@ def parse_response(json_response, task='classification'):
         features.append(prediction['features'])
         keys = np.array(prediction['classnames'])
         values = np.array(prediction['probabilities'])
+        if task.lower().startswith('patch'):
+            values_clc = np.zeros(NUM_CLC_CLASSES)    
+            np.add.at(values_clc, class_mapping, values)
+            values = values_clc
+            keys = np.array(list(CLC_CLASS_COLORS.keys()))
         values *= 100
         values = values.astype(np.uint8)
 
@@ -162,7 +174,6 @@ def parse_response(json_response, task='classification'):
 
         response.append(dict(zip(top_keys, top_values)))
 
-    # if not task.lower().startswith('patch'):
     ood = is_ood(features, task)
     
     return response, ood
@@ -202,16 +213,28 @@ def perform_upload_request(forms_data, task='classification'):
 
     result = []
     labeled_jpeg = None
-    clc_class_colors = None
 
     for data in forms_data:
-        data_bytes = data.read()
-        data_enc = base64.b64encode(data_bytes).decode('utf-8')
-        req['instances'].append({'b64': data_enc})
-
         if not task.lower().startswith('patch'):
+            data_bytes = data.read()
+            data_enc = base64.b64encode(data_bytes).decode('utf-8')
+            req['instances'].append({'b64': data_enc})
             result.append(NI4OSResult(data_enc, data.mimetype))
-
+        else:
+            img = Image.open(data)
+            newheight = img.height // HEIGHT * HEIGHT
+            newwidth = img.width // WIDTH * WIDTH
+            img = img.crop((0, 0, newwidth, newheight))
+            OVERLAP = 2 if 'smoothed' in task.lower() else 1
+            for j in range(0, img.height-HEIGHT+1, HEIGHT//OVERLAP):
+                for i in range(0, img.width-WIDTH+1, WIDTH//OVERLAP):
+                    patch = img.crop((i, j, i+WIDTH, j+HEIGHT))
+                    patch_jpeg = io.BytesIO()
+                    patch.save(patch_jpeg, 'JPEG')
+                    patch_enc = base64.b64encode(patch_jpeg.getvalue()).decode('utf-8')
+                    req['instances'].append({'b64': patch_enc})
+                    result.append(NI4OSResult(patch_enc, data.mimetype))
+            
     data_to_send = json.dumps(req)
 
     if task.lower() == 'classification':
@@ -222,65 +245,46 @@ def perform_upload_request(forms_data, task='classification'):
         json_response = requests.post('http://localhost/multilabel-upload-api',
                                     headers = headers,
                                     data=data_to_send)
-    elif task.lower() == 'patch-based classification':
-        json_response = requests.post('http://localhost/upload-api-patches',
-                                    headers=headers,
-                                    data=data_to_send)
-    elif task.lower() == 'patch-based classification (smoothed)':
-        json_response = requests.post('http://localhost/upload-api-patches-smoothed',
-                                    headers=headers,
+    elif task.lower().startswith('patch'):
+        json_response = requests.post('http://localhost/upload-api',
+                                    headers = headers,
                                     data=data_to_send)
 
     response, ood = parse_response(json_response, task)
 
     if task.lower().startswith('patch'):
-        ROOT = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
-            clc_class_colors = json.load(f)
+        labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
+        k = 0
+        if 'smoothed' in task.lower():
+            probas_patches = []
+        for j in range(0, img.height-HEIGHT+1, HEIGHT//OVERLAP):
+            for i in range(0, img.width-WIDTH+1, WIDTH//OVERLAP):                 
+                if task.lower() == 'patch-based classification':
+                    cls = list(response[k].keys())[0]
+                    color_code = CLC_CLASS_COLORS[cls]
+                    labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
+                    k += 1
+                elif task.lower() == 'patch-based classification (smoothed)':
+                    proba = np.array(list(response[k].values()))
+                    probas_patches.append(np.tile(proba, (HEIGHT, WIDTH, 1)))
+                    k += 1
 
-        for data in forms_data:
-            img = Image.open(data)
-            newheight = img.height // HEIGHT * HEIGHT
-            newwidth = img.width // WIDTH * WIDTH
-            img = img.crop((0, 0, newwidth, newheight))
-            labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
-            k = 0
+        if task.lower().startswith('patch-based classification'):
             if 'smoothed' in task.lower():
-                OVERLAP = 2
-                probas_patches = []
-            for j in range(0, img.height-HEIGHT+1, HEIGHT//OVERLAP):
-                for i in range(0, img.width-WIDTH+1, WIDTH//OVERLAP):
-                    patch = img.crop((i, j, i+WIDTH, j+HEIGHT))
-                    patch_jpeg = io.BytesIO()
-                    patch.save(patch_jpeg, 'JPEG')
-                    result.append(NI4OSResult(base64.b64encode(patch_jpeg.getvalue()).decode('utf-8'), data.mimetype))
-                    
-                    if task.lower() == 'patch-based classification':
-                        cls = list(response[k].keys())[0]
-                        color_code = clc_class_colors[cls]
-                        labelmap[j:j+HEIGHT, i:i+WIDTH, :] = color_code
-                        k += 1
-                    elif task.lower() == 'patch-based classification (smoothed)':
-                        proba = np.array(list(response[k].values()))
-                        probas_patches.append(np.tile(proba, (HEIGHT, WIDTH, 1)))
-                        k += 1
-
-            if task.lower().startswith('patch-based classification'):
-                if 'smoothed' in task.lower():
-                    classnames = list(response[0].keys())
-                    proba_map = recreate_from_subdivs(probas_patches, HEIGHT, OVERLAP, [img.height, img.width, NUM_CLC_CLASSES])
-                    final_prediction = np.argmax(proba_map, axis=2)
-                    for cl in range(NUM_CLC_CLASSES):
-                        labelmap[final_prediction == cl] = clc_class_colors[classnames[cl]]
-                labeled = Image.fromarray(labelmap)
-                labeled = Image.blend(labeled, img, 0.5)
-                labeled_jpeg = io.BytesIO()
-                labeled.save(labeled_jpeg, 'JPEG')
-                labeled_jpeg.seek(0)
-                labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')    
+                classnames = list(response[0].keys())
+                proba_map = recreate_from_subdivs(probas_patches, HEIGHT, OVERLAP, [img.height, img.width, NUM_CLC_CLASSES])
+                final_prediction = np.argmax(proba_map, axis=2)
+                for cl in range(NUM_CLC_CLASSES):
+                    labelmap[final_prediction == cl] = CLC_CLASS_COLORS[classnames[cl]]
+            labeled = Image.fromarray(labelmap)
+            labeled = Image.blend(labeled, img, 0.5)
+            labeled_jpeg = io.BytesIO()
+            labeled.save(labeled_jpeg, 'JPEG')
+            labeled_jpeg.seek(0)
+            labeled_jpeg = base64.b64encode(labeled_jpeg.getvalue()).decode('utf-8')    
              
     for k, (res, ood_flag) in enumerate(zip(response, ood)):
         result[k].results = res
         result[k].ood = ood_flag
 
-    return result, labeled_jpeg, clc_class_colors
+    return result, labeled_jpeg, CLC_CLASS_COLORS

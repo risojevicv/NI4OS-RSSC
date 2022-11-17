@@ -54,20 +54,6 @@ def classify_images_multilabel():
             data=request.data)
     return json_response.json()
 
-@app.route('/upload-api-patches', methods=['POST'])
-def classify_image_patches():
-    json_response = requests.post('http://rssc:8501/v1/models/rssc-patches/versions/1:predict',
-            headers=request.headers,
-            data=request.data)
-    return json_response.json()
-
-@app.route('/upload-api-patches-smoothed', methods=['POST'])
-def classify_image_patches_smoothed():
-    json_response = requests.post('http://rssc:8501/v1/models/rssc-patches-smoothed/versions/1:predict',
-            headers=request.headers,
-            data=request.data)
-    return json_response.json()
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
