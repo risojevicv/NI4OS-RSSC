@@ -28,6 +28,7 @@ from app.models import NI4OSResult, NI4OSData
 
 WIDTH = 256
 HEIGHT = 256
+BATCH_SIZE = 128
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, 'clc_class_colors.json')) as f:
     CLC_CLASS_COLORS = json.load(f)
@@ -234,24 +235,44 @@ def perform_upload_request(forms_data, task='classification'):
                     patch_enc = base64.b64encode(patch_jpeg.getvalue()).decode('utf-8')
                     req['instances'].append({'b64': patch_enc})
                     result.append(NI4OSResult(patch_enc, data.mimetype))
-            
-    data_to_send = json.dumps(req)
 
     if task.lower() == 'classification':
+        data_to_send = json.dumps(req)
         json_response = requests.post('http://localhost/upload-api',
                                     headers = headers,
                                     data=data_to_send)
+        response, ood = parse_response(json_response, task)
     elif task.lower() == 'tagging':
+        data_to_send = json.dumps(req)
         json_response = requests.post('http://localhost/multilabel-upload-api',
                                     headers = headers,
                                     data=data_to_send)
+        response, ood = parse_response(json_response, task)
     elif task.lower().startswith('patch'):
-        json_response = requests.post('http://localhost/upload-api',
-                                    headers = headers,
-                                    data=data_to_send)
-
-    response, ood = parse_response(json_response, task)
-
+        req1 = {'signature_name': 'serving_default', 'instances': []}
+        response = []
+        ood = []
+        num_queries = len(req['instances'])
+        num_batches = num_queries // BATCH_SIZE
+        for i in range(num_batches):
+            req1['instances'] = req['instances'][i*BATCH_SIZE:(i+1)*BATCH_SIZE]
+            data_to_send = json.dumps(req1)
+            json_response = requests.post('http://localhost/upload-api',
+                                          headers = headers,
+                                          data=data_to_send)
+            response1, ood1 = parse_response(json_response, task)
+            response += response1
+            ood += ood1
+        if (i+1)*BATCH_SIZE < num_queries:
+            req1['instances'] = req['instances'][(i+1)*BATCH_SIZE:]
+            data_to_send = json.dumps(req1)
+            json_response = requests.post('http://localhost/upload-api',
+                                          headers = headers,
+                                          data=data_to_send)
+            response1, ood1 = parse_response(json_response, task)
+            response += response1
+            ood += ood1
+            
     if task.lower().startswith('patch'):
         labelmap = np.zeros((img.height, img.width, 3), dtype='uint8')
         k = 0

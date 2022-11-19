@@ -27,6 +27,7 @@
         {% else %}
         <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
         {% endif %}
+        {% if not 'smoothed' in task %}
         {% for item in res %}
         <div class="row border bg-light">
             <div class="col-md-4 justify-content-center">
@@ -79,6 +80,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-    <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
+        <p class="d-flex justify-content-end"><a href="{{ url_for('index') }}">New image</a></p>
+        {% endif %}
     </div>
 {% endblock %}
