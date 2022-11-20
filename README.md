@@ -4,7 +4,7 @@
 
 The number of remote sensing platforms for monitoring the surface of the Earth has been growing at ever increasing pace. Consequently, the amount of remote sensing images has surpassed our abilities for manual analysis. Luckily, recent advances in computer vision have provided us with new tools for automatic analysis of remote sensing images. 
 
-Scene classification is a key step in remote sensing image analysis aiming to annotate each image with labels from a pre-defined set. These annotations can be used for applications like land cover and land use classification, monitoring urban growth, monitoring and forecasting climate changes, to name only a few. Recently, using remote sensing for monitoring of ecosystems, insects and animals also gains in significance. 
+Scene classification is a key step in remote sensing image analysis aiming to annotate each image with labels from a pre-defined set. These annotations can be used for applications like land cover and land use classification, monitoring urban growth, monitoring and forecasting climate changes, to name only a few. Recently, using remote sensing for monitoring of ecosystems, insects and animals have also gained in significance. 
 
 Convolutional neural networks (CNNs) have become a de facto standard in various computer vision tasks, ranging from image classification to object detection to semantic segmentation. However, training of CNNs requires considerable computing resources as well as large labeled training sets. In order to lift the burden of CNN training and enable end-users to reap the benefits of using powerful CNN-based classifiers, RS2C offers access to pre-trained CNN models for remote sensing scene classification. In other words, RS2C aims to assist in making sense of the remote sensing imagery acquired using various sensing platforms, ranging from satellites to UAVs. The default problem in remote sensing scene classification is single-label multi-class classification. However, in many cases remote sensing images cannot be accurately described using a single label. For that reason, RS2C also features multi-label classification. Main user communities envisaged to benefit from this service are in the areas of agriculture, food production, urban planning, and environment protection, but practitioners in other fields may also find it useful. 
 
@@ -30,11 +30,13 @@ Both methods return a JSON object with a list of labels and confidences that eac
 
 You can try the service at https://rs2c.etfbl.net.
 
+For training/fine-tuning the models please refer to [this](https://github.com/risojevicv/RSSC-transfer) repository. 
+
 ## Installation and Running
 
 For running the service we use Docker and Docker Compose. Please install the latest stable versions of Docker Engine and Docker Compose as per  instructions on https://docs.docker.com/compose/install/.
 
-Directory `service` contains code for building a Docker image with the TensorFlow Serving model. The trained models can be downloaded  [here](https://drive.google.com/drive/folders/1Yp_B--dWDimvJFLA3cssxTrHTcZkV8Hu?usp=sharing) and should be put into `service/models` directory. For training/fine-tuning the models please refer to [this](https://github.com/risojevicv/RSSC-transfer) repository. 
+Directory `service` contains code for building a Docker image with the TensorFlow Serving model. The trained models can be downloaded  [here](https://drive.google.com/drive/folders/1Yp_B--dWDimvJFLA3cssxTrHTcZkV8Hu?usp=sharing) and should be put into `service/models` directory. 
 
 Directory `webapp` contains code for building a Docker image with the frontend app that can be used for service demonstration as well as the code for wrapping TensorFlow Serving calls. The index files for k-nearest neighbor-based out-of-distribution detection can be downloaded [here](https://drive.google.com/drive/folders/1NGJjlWclp5bJAvWqY0_zB8l0JAO8nDY9?usp=sharing) and should be put into `webapp/app/knn_indices' directory.
 
