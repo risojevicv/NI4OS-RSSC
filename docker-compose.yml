@@ -3,6 +3,7 @@ services:
   flask:
     container_name: ni4os-webapp
     restart: always
+    image: risojevicv/ni4osrssc_flask
     build:
         context: ./webapp
         dockerfile: Dockerfile
@@ -11,6 +12,7 @@ services:
   tf_serving:
     container_name: rssc
     restart: always
+    image: risojevicv/ni4osrssc_tf_serving
     build:
         context: ./service
         dockerfile: Dockerfile
